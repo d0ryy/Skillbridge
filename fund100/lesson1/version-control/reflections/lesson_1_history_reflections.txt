@@ -1,0 +1,4 @@
+How can you use the commands git log and git diff to view the history of files?
+
+First by using git log, you can see all the different commits that have happened on that group of files/file.
+If you want to see the difference in between past commits, you can simply do git diff ID1 ID2 and you can then see specifically what was changed. Or you can simply do git diff --stat id1 id2 to just see the inserations and deletions.

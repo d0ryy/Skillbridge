@@ -1,0 +1,3 @@
+How might using version control make you more confident to make changes that could break something?
+
+If you are using version control, breaking something isn't bad as you can just revert back to a known good. This makes it easier to have confidence knowing if you do break something you can easily revert it back.

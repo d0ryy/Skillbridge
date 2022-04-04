@@ -1,0 +1,3 @@
+How could having easy access to the entire history of a file make you a more efficient programmer in the long term?
+
+Having the entire history can allow you see the changes you have made previously and you can refelect on why you made those changes (for better or for worse). This can develop your coding standards as you can learn from past mistakes so you don't implement them again, if they ended up failing/needed revision.

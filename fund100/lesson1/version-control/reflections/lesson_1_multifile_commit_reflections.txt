@@ -1,0 +1,4 @@
+Why do you think some version control systems, like Git, allow saving multiple files in one commit, while others, like Google Docs, treat each file separately?
+
+
+Git was probably made with coding in mind, oppose to google docs / dropbox where they are based on individual files (Photos, Documents, etc) where it wouldn't make sense to save multi files clumped together.
