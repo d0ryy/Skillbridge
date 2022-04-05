@@ -1,0 +1,57 @@
+
+
+git init : creates the git repository at 
+	get init
+		Doesn't make any commits to start, you have to manually create a repository
+		
+git status: shows status of current repository, including untracked and tracked files
+	git status
+	
+Staging area : Used to prepare a git commit. Can include multi files or single
+	git add file.txt
+	git add file2.txt
+
+git add : Used to add a file to the staging area, allowing you to prepare to commit.
+	git add file1.txt
+	
+git reset: Used to remove the file from the staging area
+	git reset lesson_2_reflections.txt
+	
+git commit: Used to commit any files in the staging area
+	git commit  | opens saved editor to create message
+	git commit -m "Commit message"
+
+git diff --staged : shows difference between staging area and commit 
+
+git reset --hard : discards changes in working dir and staging 
+	THIS IS NOT REVERSABLE. Ensure you want to do this!
+
+
+Master given to main branch 
+	branches are just labels
+	"Tip" of the branch, is just most recent
+	
+Merging
+	Combining two branches into one
+	git merge branch1 branch2
+	
+git branch : shows all branches
+	git branch easy-mode  | creates a new branch
+	git checkout easy-mode  |changes branches
+	git branch -d coins | deletes branch (removes label) if done after a merge
+remote branch
+	not owned by you
+
+git log --graph --oneline naster coins | makes a graph comparing each branch
+
+git checkout -b new_branch_name
+	git branch new_branch_name
+	git checkout new_branch_name
+	
+	
+git show : shows changes compared to its parent
+
+
+
+git config --global init.defaultBranch main| changes default branch name to main (githubs default)
+

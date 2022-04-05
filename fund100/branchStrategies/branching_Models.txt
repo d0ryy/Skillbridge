@@ -1,0 +1,86 @@
+Vincent Driessen - Branching Model:
+
+Why Git:
+	Actions are easy to learn compared to similar alts. (CVS/Suberversion)
+
+Decentralized but Centralized:
+	Git is a DVCS (Distributed Version Control), there is no such thing as a central repo at a technical level. There is a repo that is considered central though. Origin is sometimes used as a standard naming for the central repo. Each dev. pulls and pushes to origin. Each dev. may also pull changes from other peers to form sub teams.
+
+The Main Branches:
+	Central repo holds two main branches:
+		master/main
+		dev/develop
+	main branch at origin is the "default" production branch. Parellel to that should be dev/develop. main is where the source code of HEAD always reflects a production-ready state.
+	develop is the source code of HEAD that reflects a state with the latest delivered development changes for the next release (hence the name dev). When dev hits a stable point, its ready to be merged back into master with a tagged release number.
+	Using this, you can automate build and roll-out the software to production, as you know its up to date.
+
+Supporting Branches:
+	Additional Branches are used, such as more supporting branches to aid parallel development, ease tracking of features, prepare for production, and to assist fixing live production problems. These branches normally have a limited life, since they will be removed eventually. 
+	Types:
+		Feature Branches
+		Release Branches
+		Hotfix Branches
+
+	Feature Branches:
+		Branched from dev/develop
+			merges back to dev/develop
+		Anything except already used/similar branches.
+		Used to develop new features from upcoming releases. The target release may be unknown at the time of branch, but the goal will be to eventually merge back to dev/develop.
+		Creating a Feature Branch:
+			Branch from the dev/develop branch
+				git checkout -b myfeature develop
+			Incorporating a finished feature
+			git checkout develop	switched to develop branch
+			git merge --no-ff myfeature	merge feature branch to dev, --no-ff create a new commit even if they merge didn't need it 
+			git branch -d myfeature	delete feature branch after merge
+			git push origin develop	Pushes changes to github/remote
+	
+	Release Branches:
+		Branches from develop
+			merge back into dev & master
+		Supports preparation of a new production release. Used as last minute double-checking. Allowing for minor bug fixes and preparing meta-data for release (version numbers, build dates, etc). Dev branch is cleared to receive new features.
+		Key moment to branch from dev is when development closely reflects the desired state of a new release. 
+		
+		Creating a Release Branch:
+			Branched from develop/dev. ex. 1.1.5 is current prod. release and we have a big update. The state of develop is ready for the next release. You branch to a release branch with the updated number (1.2)
+				$ git checkout -b release-1.2 develop	Create new branch off develop branch
+				$ ./bump-version.sh 1.2	script that changes some files in  the wokring copy.
+				$git commit -a -m "bumped version number to 1.2"	Commits new changes.
+				
+				This branch may exist for awhile until the release may be rolled out. During that time bug fixes may happen in this branch.
+		
+		Finishing a Release Branch:
+			When its ready for the real release, some actions need to be carried out first. Release branch is merged into master/main. Next, that commit on main must be tagged. Finally the changes made n release branch need to be merged into develop so future releases include this change.
+				$ git checkout master	Switched to master branch
+				$ git merge --no-ff release-1.2	Merge made to main | -no-ff makes sure there is a change, not just applied.
+				git tag -a 1.2	Tags branch with ver. number | can use -s or -u to sign tag cryptographically
+				$ git checkout develop 	Changes to develop branch
+				$ git merge --no-ff release-1.2	Merges into the develop branch
+				$ git branch -d release-1.2	Deletes past branch.
+	
+	Hotfix Branches:
+		Branches from Master/main
+			merged back into develop & master
+		Hotfix branches are similar to release branches, as in they are to prepare for production releases. They are unplanned, compared to release branches. They arise from the necessity to fix certain issues within the live production branch. 
+		
+		Creating the Hotfix Branch:
+			If the current production version has issues, but develop branch is unstable due to current code changes. Hotfix is used soley to fix the current issues on main/production. 
+				$ git checkout -b hotfix-1.2.1 master	creates new branch from master/main
+				$ ./bump-version.sh 1.2.1	Script that fixes the bug
+				$ git commit -a -m "bumped version number to 1.2.1"	Commits with message 
+				$ git commit -m "fixed severe production problem"	Commits after changes are done.
+		
+		Finishing a hotfix Branch:
+			Upon completion, bugfix needs to be merged back to main/master, but also needs to be merged into develop in order to safegaurd changes.
+				$ git checkout master	changes to master branch
+				$ git merge --no-ff hotfix-1.2.1	Merges into hotfix branch
+				$ git tag -a 1.2.1	Tags change
+				$ git checkout develop	Changes to develop branch
+				$ git merge --no-ff hotfix-1.2.1	Merges into develop branch
+				$ git branch -d hotfix-1.2.1	Deletes hotfix branch
+
+
+		
+
+	
+

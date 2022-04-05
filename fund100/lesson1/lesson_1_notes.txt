@@ -1,0 +1,45 @@
+
+Windows - FC (file compare)
+Linux/Max - diff (difference)
+
+
+
+
+
+
+
+git log : Shows every commit, by most recent. 
+	git log --stat 
+		shows which files (if multiple) where effected, and how many insertions and deletions
+	git log --grep=word
+		greps a word from the log list
+		
+git diff : similar to diff, but can compare different versions within git.
+	git diff id1 id2
+	
+
+
+
+
+A good rule of thumb is to make one commit per logical change
+
+
+
+Errors:
+	
+	Should not be doing an octopus
+	Octopus is a strategy Git uses to combine many different versions of code together. This message can appear if you try to use this strategy in an inappropriate situation.
+	You are in 'detached HEAD' state
+	HEAD is what Git calls the commit you are currently on. You can “detach” the HEAD by switching to a previous commit, which we’ll see in the next video. Despite what it sounds like, it’s actually not a bad thing to detach the HEAD. Git just warns you so that you’ll realize you’re doing it.
+	
+git checkout : Changes from current repository to old one, allowing you to revert
+	git checkout (ID)
+
+git workspace:
+	git config --global core.editor "'/Applications/Sublime Text 2.app/Contents/SharedSupport/bin/subl' -n -w"
+	git config --global push.default upstream
+	git config --global merge.conflictstyle diff3
+	
+
+
+

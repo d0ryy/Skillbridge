@@ -1,0 +1,38 @@
+https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git
+
+
+Adding github to cli
+	git remote
+	git remote add origin git@github.com:username/repo
+	git remote -v
+	git remote rm name | removes remote 
+	
+
+Pushing Changes
+	git push origin master |origin is the remote, master is current branch
+
+Pulling changes
+	git pull origin master | pulls master branch from origin
+	
+Forking 
+	copy of someone's repository 
+
+Conflicting Collaboration
+	
+merging remote changes
+	git fetch : Updaes local of remote branch, allows you to update. Doesn’t remove anything
+	git pull orgin master 
+		git fetch origin
+		git merge master origin/master
+git collaberation
+	git branch different-oil
+	git checkout different-oil
+		make changes
+	git add file.txt
+	git commit
+	fit push origin different-oil
+	
+git push -u origin main | creates new remote branch  with main as name
+
+git push origin --delete master  |deletes remote branch
+

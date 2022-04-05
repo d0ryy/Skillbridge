@@ -1,0 +1,22 @@
+GitHub-Flow:
+Creating Branches:
+	https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-and-deleting-branches-within-your-repository
+	Creating a new branch from main allows you to have better flexibility when it comes to changes. " If you make a mistake, you can revert your changes or push additional changes to fix the mistake"
+
+Commit Comments:
+	When you commit ensure you give a descriptive message (ex. fix type, increase rate limit). Write it as if you are saying what to do, not what you did (fix not fixed, add not added, etc). This is from GIT itself, not github.
+		"Describe your changes in imperative mood, e.g. "make xyzzy do frotz" instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy to do frotz", as if you are giving orders to the codebase to change its behavior."
+
+Creating a Pull Request:
+	https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request
+	Used to ask collaborators for feedback on changes. When creating a request, include a summary of changes and what problem they solve.
+	
+Address Review Comments:
+	Reviewers should leave questions, comments, and suggestions. Reviewers can comment on whole code or just a single line.
+	
+Merge Pull Request:
+	Once pull request is approved, merge your pull request. This will automatically merge your branch to the default branch. You will be informed of any conflicts before.
+Delete branch:
+	This will "delete" the branch, but in reality all past commits are still there the label is just removed. Done after a merge normally.
+
+
