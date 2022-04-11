@@ -1,0 +1,359 @@
+Assembler: program that translates assembly into machine-readable code.
+	Assembly is different for each processor architecture
+Compiler: Converts a high-level language into machine language
+Pseudo-code : English arranged with a general coding strucutre. Doesn't compile.
+
+ C doesn’t need { } if its as single instruction
+	ex.
+		do something;
+		If (something is true)
+		{
+			it’s a good day;
+			it’s a fine week;
+		}
+		else
+			it’s a bad day;
+C doesn't have boolean operators, so any non-zeo is considered true, anything equal to 0 is considered false.
+
+two assemby syntax' 
+	AT&T 	Almost All Linux	Look for the % and $ symbols	Read Source - Destination
+	Intel	Easier to read	Doesn't have the % and $ symbols	Read Destination - Source 
+	
+	
+	Intel:
+		Intel Syntax generally follows this style:
+			operation <destination>, <source>
+		Destination & source will either be a register, memory address, or a value.
+		
+		
+
+Registers:
+	Processor special variables. Used for read/write data.
+Debugger:
+	used by programmers to step through compiled programs, examine program memory, and view processor registers.
+	
+	GDB:
+		GDB is used to show the state of the processor registers right before the program starts.
+			$ gdb -q ./a.out
+			(gdb) break main
+			(gdb) run
+			(gdb) info registers
+			(gdb) quit
+			
+			(bdb) set disassembly intel	This sets the  syntax to intel
+			$ echo "set dis intel" > ~/.gdbinit	Sets global default to intel
+			(gdb) list	List the .c code
+			(gdb) disassemble main	Dumps assemble code for func main
+			(gdb) break main	sets breakpoint at fun main
+			(gdb) run	Runs program
+			(gdb) info register eip	Gets info for register id
+			(gdb) I r eip	^ shorthand version
+			
+GCC:
+	gcc -g a.out	extra debugging information
+
+
+First 	Four	Registers
+EAX	Accumulator	Temp Variables
+ECX	Counter	Temp Variables
+EDX	Data	Temp Variables
+EBX	Base Registers	Temp Variables
+Second	Four	Registers
+ESP	Stack Pointer	Pointer: Store 32-bit Addresses
+EBP	Base Pointer	Pointer: Store 32-bit Addresses
+ESI	Source Index	Pointers(ish): Often used to point to source and destination for r/w
+EDI	Destination Index	Pointers(ish): Often used to point to source and destination for r/w
+------------	------------------------	-----------------------------------------------------------------------------------------
+EIP	Instruction Pointer	Register: Points to current instruction the processor is reading
+EFLAGS		Register: several bit flags. Used for compare & memory segmentation
+
+
+Reading Assembly Example:
+	8048375:     89 e5               mov     ebp,esp
+	8048377:     83 ec 08          sub     esp,0x8
+	
+	mov = moves the value from the source to the destination (moves esp value to ebp)
+	sub = subtracts the value from the source to the destination (subtracts 8 from esp, stores in esp)
+	
+	804838b:        83 7d fc 09           cmp     DWORD PTR [ebp-4],0x9
+	804838f:        7e 02                      jle        8048393 <main+0x1f>
+	8048391:        eb 13                     jmp     80483a6 <main+0x32>
+
+	cmp = compares values
+	j* = used to jump to a different part of the code (depending on results of the compare)
+	
+	o  Display in octal
+	x  Display in hex
+	u  Display in unsigned, standard base-10 decimal
+	t  Display in binary
+		Single letter shorthand
+
+			(gdb) x/o 0x8048384
+			0x8048384 <main+16>:    077042707
+			(gdb) x/x $eip
+			0x8048384 <main+16>:    0x00fc45c7
+			(gdb) x/u $eip
+			0x8048384 <main+16>:    16532935
+			(gdb) x/t $eip
+			0x8048384 <main+16>:    00000000111111000100010111000111
+			(gdb)
+			
+	You can look at look at multiple units at the target address if you prepend
+		Ex.
+			(gdb) x/2x $eip
+			0x8048384 <main+16>:    0x00fc45c7     0x83000000
+			(gdb) x/12x $eip
+			0x8048384 <main+16>:    0x00fc45c7     0x83000000     0x7e09fc7d     0xc713eb02
+			0x8048394 <main+32>:    0x84842404     0x01e80804     0x8dffffff     0x00fffc45
+			0x80483a4 <main+48>:    0xc3c9e5eb     0x90909090     0x90909090     0x5de58955
+			(gdb)
+			
+	b   A single byte
+	h   A halfword, which is two bytes in size
+	w  A word, which is four bytes in size 
+		sometimes refers to 2-byte values. | DWORD / DoubleWord = 4 byte value
+	g   A giant, which is eight bytes in size
+		ex.
+			(gdb) x/8xb $eip
+			0x8048384 <main+16>:    0xc7    0x45    0xfc    0x00    0x00    0x00    0x00    0x83
+			(gdb) x/8xh $eip
+			0x8048384 <main+16>:    0x45c7  0x00fc  0x0000  0x8300  0xfc7d  0x7e09  0xeb02  0xc713
+			(gdb) x/8xw $eip
+			0x8048384 <main+16>:    0x00fc45c7      0x83000000      0x7e09fc7d      0xc713eb02
+			0x8048394 <main+32>:    0x84842404      0x01e80804      0x8dffffff      0x00fffc45 
+			(gdb)
+	lea	Load Effective Address	Loads EBP - 4 into the EAX register
+	inc	Increment Counter 	Increases by 1
+	
+Stack:
+	Lets EIP return through long chains of function calls.
+	(gdb) bt	Backtrace the stack
+	
+Negatives numbers:
+	saved differently than positive/unsigned values.
+	Uses Two's Complement: reoresents negatives numbers in a form suited for binary adders.
+		When its added to a positive number of the same magnitude, the result is 0.
+			Write the positive number, invert all bits, and finally add 1.
+	ex.
+		01001001 = 73
+		10110110 + 1 = 10110111 (183)
+		01001001 + 10110111 = 1 00000000 (256)
+			extra bit is thrown away due max memory only looking at 8 bytes
+			
+
+
+0x263 : Pointers
+
+EIP : Pointer that "points" to the current instruction during execution.
+	Used to save memory. Easier to pass around the address that is needed, instead of copying the data.
+32-bit addressing, uses 32-bit (4 byte) pointers.
+	Defined by prepending (*) to the var name.
+		
+address-of operator:
+	used to see the actual data stored in the pointer variable.
+	unary operator: operates on a single argument.
+		& prepended to a var name.
+		When used, the address of that var is returned instead of the variable itself.
+		
+0x264 : Format Strings
+	GDB:
+		%d 	decimal , Allows for negative
+		%u	unsigned decimal, doesn't allow negative
+		%x 	Hexadecimal
+		%s	string
+		%n	number of bytes written so far
+		%c	Char
+		% is expecting a memory address.
+0x265 : Typecasting , pg 51
+	temp changes a varibles data  type, despite its original definition. 
+		(typecast_data_type) variable
+	Used when dealing with integers and floating point vars.
+	
+	de-reference the pointer variables using the unary * operator. 
+	
+	char var is only 1 byte
+	int var is 4 bytes 
+	
+	void pointers:
+		type less pointer, main purpose is to simply hold a memory address.
+	
+	Compiler is the only thing that cares about the variable's type.
+		means that variables of one type can easily be coerced into behaving like another type by simply telling the compiler to typecast them.
+		
+0x266 : Command-Line Arguments: pg. 58
+	
+	atoi() : Ascii to integer.
+		accepts a pointer to a string, returns the integer value it represents.
+	
+Variable Scoping:
+	Global var:
+		set at beginning of code. (before function call)
+		can be changed per function I
+			only if done correctly
+				ex. int I = 12; // this will set up a local func var
+				       j = 244 ; //this writes to global if in a function
+	Local Var:
+		Set within the function. Only usable in that function
+			ex. Having 3 functions with var I = to separate things. When called, each function will return that value stored in that local
+	
+	Static Var:
+		similar to global, static remains intact between function calls. They are only used within a functions context. They are only initalized once.
+	
+	GDB Backtrace : (gdb) bt
+		Shows the nested function calls by looking at records kept on the stack
+			Each time a function is called, a record called a stack frame is put on the stack. Each line in the backtrace corresponds to a stackgrame. Each stackfreame also contains the local var for that context.
+		Each stack freame can be shown by using adding full to the command
+			(gdb) bt full
+
+
+0x270 : Memory Segmentation - pg. 
+	
+	compiled program memory is diveded into five segments: text, data, bss, heap, and stack
+	
+	Text Segment: aka Code Segment
+		Assembled machine language instructions of the program are located.
+		Execution is non-linear, thanks to high-level controll structures and cuntions.
+			compile into branch, jump, and call instructions
+		When program executes, the eip is set to the first instriction in the text/code segment. 
+			Processor then does the following:
+				1. Reads the instruction that EIP is point to
+				2. Adds the byte length of the instruction to EIP
+				3. Executes the instruction that was read in step 1
+				4. Goes back to step 1
+		If the instruction is to jump/call. The processor doesn't care because its not expeecting it to be linear. If it changes in step 3, it will go simply go back to step one, look at the EIP and continue.
+		Write permission is disabled, as its not used to store vars, only code. This prvents people from modifying the program code. If writes to this segment are attempted, the program will alert the user that something bad happened, and the program will be killed.
+	Data / BSS :
+		Used to store global and static program vars.
+		Data:
+			Filled with the initialized global and stataic vars
+		BSS: 
+			Filled with the uninitialized global and static vars
+		Both are writable, but they have fixed sizes.
+		
+	Heap Segment:
+		Memory that a programmer can directly control.
+		Isn't a fixed size, can grow larger or smaller depending on needs.
+		All memeory within the heap is managed by allacator and deallocator algorithms, which reserve a region of memory in the heap for use. 
+	Stack Segment:
+		Variable size, and used as temporary scratch pad to store local function vars and context during function calls.
+			Used by GDB backtrace commands
+		Stacked is used to remember all passed vars used by  a function when its called. all that information is stored together on a stack frame. The stack contains many stack frames.
+		
+		First-in, last-out (FILO) ordering. First item in, is the last one out.
+			ex. putting beads on a piece of string.
+		When placed in the stack: Pushing
+		When removed from the stack : popping
+		As stack changes size, it grows upwards in listing of memeory, toward lower memory addresses.
+		
+		EBP Register : Frame Pointer (FP) / Local Base (LB) Pointer
+			Used to reference local function variables in the current stack frame.
+				Contains the parameters to the function, its local vars, and two pointers used to put things back the way they were
+				Saved Frame Pointer (SFP): 
+					Used to restore EBP to its previous value
+				Return Address:
+					Used to restore EIP to the next instruction found after the function all.
+					Thus restoring back to the previous stack frame.
+		Procedure Prologue / Function Prologue :
+			First few instructions, used to set up the stack frame. They save the frame pointer on the stack. 
+			
+		Reason for FILO data structure:
+			If another funtion was called within the function, another stack frame would be pushed onto the stack, and so on. As each function ends, its stack frame is popped off of the stack so execution can return to the previous function. Without it being irst in last out, there would be no way for a it to call back to its original function.
+				ex. Russian Nesting Dolls, but think of each doll holding a function. 
+				
+	Memory Segments in C:
+		Complied code goes into the text-segment
+		Variables reside in the remaining segments.
+			Depends on how it was defined.
+				Outside of any function  = global variables.
+				Static Vars too
+					If initialized with data:
+						Stored in the data memory segment
+					w/ no data:
+						BSS memory segment.
+		Memory on Heap segment  requires allocating.
+			malloc()
+		Remaining vars are stored on the stack memory segment.
+	
+	Using the Heap:
+		Allocating is done with malloc()
+			accepts only a size as its argument, reserves that much space in the heap segment.
+			If it can't, will return a NULL pointer with a value of 0.
+		De-allocate is done with free()
+			Accept only a pointer as its argument.
+	Error-Checked malloc()
+		Important to handle all potential error cases when coding in C.
+		If molloc() being called multiple times, can clean the code by simply turning the fprintf() / error handling into a function
+		
+0x280 : Building on Basics - 
+	File Access:
+		File Descriptors:
+			Low-level I/O functions
+		Filestreams:
+			Higher-level form of buffered I/O w/ built on lower level functions.
+		
+		Filestreams are considered "easier", however, file descriptors are more direct.
+		File Descriptors is a number that is used to reference open files.
+			Common functions used for this:
+				open()
+					Opens a file for reading and/or writing and turns a file descriptor
+					Returned file descriptor is just an integer value, unique among open files
+					Passed as an argument to other functions like a pointer
+				close()
+					File descriptor is the only argument
+				read()
+				write()
+					arguments are the file descriptor, a pointer to the data to  read or write
+					Number of bytes to read or write from that location too.
+					
+				All will return -1 if there is an error.
+				Access mode must use at least one of the following flags:
+					0_RDONLY
+						Open file for read only access
+					O_WRONLY
+						Write only
+					O_RDWR
+						Read/Write
+				Can be combined with optional flags using thebitwise OR operator
+					O_APPEND
+						Write data at the end of file
+					O_TRUNC
+						If file exists, truncate the file to 0 length
+					O_CREAT
+						Create the file if it doesn't exist
+		File Permissions:
+			If the O_CREAT flag is used in access mode for open(), more arguments are needed.
+				S_IRUSR 	Give the file read permission for the user (owner).
+				S_IWUSR 	Give the file write permission for the user (owner).
+				S_IXUSR 	Give the file execute permission for the user (owner).
+				S_IRGRP 	Give the file read permission for the group.
+				S_IWGRP	 Give the file write permission for the group.
+				S_IXGRP	 Give the file execute permission for the group.
+				S_IROTH 	Give the file read permission for other (anyone).
+				S_IWOTH 	Give the file write permission for other (anyone).
+				S_IXOTH 	Give the file execute permission for other (anyone).
+	
+	Structs:
+		Variables that can contain many other variables.
+		Often used by various system functions and libraries.
+			ex. tm	/usr/unclude/time.h
+				which is used when normally dealing with time functions
+			After defined, it becomes a usable variable type which can be used
+		Can be accessed 3 different ways:
+			Adding the elements name to the end of a var with a period
+				hour = current_time.tm_hour;  // Direct access
+			Using a series of characters that look like an arrow pointing  right
+				minute = time_ptr->tm_min;    // Access via pointer
+			Hacky way
+				 second = *((int *) time_ptr); // Hacky pointer access
+	Function Pointers:
+		Pointer contains a memory address and is given a data type that describes where it points.
+		Normally just for vars, but can be used for functions
+	
+	Pseudo-random Numbers:
+		Computers can't create truly random, but can create psuedo random.
+		Need to randomize the seed each time to get psuedo random. If same seed is used you will get re-occuring pattern.
+			Set srand(),
+				after that rand() can be called.
+		Common technique:
+			set the srand() to epoch time, that way it changes every time without input from something even less random
+
