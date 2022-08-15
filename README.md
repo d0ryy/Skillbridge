@@ -1,1 +1,1 @@
-Working Repository for any learning/training regarding the skillbridge
+Working Repository for any learning/training regarding the internship
